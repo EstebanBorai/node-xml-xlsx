@@ -1,0 +1,36 @@
+{
+  "name": "node-xml-xlsx",
+  "version": "0.1.0",
+  "description": "XLSX file generator for NodeJS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup --config",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/estebanborai/node-xml-xlsx.git"
+  },
+  "keywords": [
+    "xlsx",
+    "nodejs",
+    "xml",
+    "generator",
+    "writer"
+  ],
+  "author": "Esteban Borai <estebanborai@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/estebanborai/node-xml-xlsx/issues"
+  },
+  "homepage": "https://github.com/estebanborai/node-xml-xlsx#readme",
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "rollup": "^1.17.0",
+    "rollup-plugin-babel": "^4.3.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
