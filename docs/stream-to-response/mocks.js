@@ -10,7 +10,7 @@ module.exports = {
 					clientName: 'Beto Marquez',
 					orderDate: new Date()
 				});
-			}, 3000);
+			}, 2500);
 		});
 	},
 }

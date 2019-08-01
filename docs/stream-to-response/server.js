@@ -21,6 +21,19 @@ app.get('/file', (req, res) => {
 	// Get reference to readable stream
 	const readableStream = workbook.getReadableStream();
 
+	//initialize workbook
+	workbook.init();
+
+	//Add header row
+	workbook.addRow([
+		'orderId',
+		'address',
+		'postalCode',
+		'clientId',
+		'clientName',
+		'orderDate'
+	]);
+
 	// Listen on readableStream `data` event
 	// and writes to response
 	readableStream.on('data', (chunk) => {
@@ -43,6 +56,9 @@ app.get('/file', (req, res) => {
 	// "Fetches data" and write results to existing workbook
 	mockFetch()
 		.then((data) => {
+			workbook.addRow(Object.values(data));
+			workbook.addRow(Object.values(data));
+			workbook.addRow(Object.values(data));
 			workbook.addRow(Object.values(data));
 		})
 		.then(() => {
