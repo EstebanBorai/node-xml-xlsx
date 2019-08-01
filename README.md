@@ -1,2 +1,2 @@
 # node-xml-xlsx
-📋 XLSX File Creator
+📋 XLSX file generator for NodeJS
