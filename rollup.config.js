@@ -1,14 +1,12 @@
-const babel = require('rollup-plugin-babel');
+const typescript = require('rollup-plugin-typescript');
 
 module.exports = {
-  input: 'src/index.js',
+  input: 'src/index.ts',
   output: {
     file: 'dist/index.js',
     format: 'cjs'
 	},
 	plugins: [
-		babel({
-			exclude: 'node_modules/**'
-		})
+		typescript()
 	],
 };

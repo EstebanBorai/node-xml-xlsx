@@ -27,8 +27,11 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "@types/archiver": "^3.0.0",
     "rollup": "^1.17.0",
-    "rollup-plugin-babel": "^4.3.3"
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-typescript": "^1.0.1",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
     "archiver": "^3.1.1"
