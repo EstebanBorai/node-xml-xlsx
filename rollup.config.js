@@ -1,4 +1,7 @@
-const typescript = require('rollup-plugin-typescript');
+const babel = require('rollup-plugin-babel');
+const resolve = require('rollup-plugin-node-resolve');
+
+const extensions = ['.ts'];
 
 module.exports = {
   input: 'src/index.ts',
@@ -7,6 +10,15 @@ module.exports = {
     format: 'cjs'
 	},
 	plugins: [
-		typescript()
+		babel({
+			exclude: 'node_modules/**',
+			extensions
+		}),
+		resolve({
+			extensions,
+			customResolveOptions: {
+				moduleDirectory: 'src',
+			}
+		})
 	],
 };
