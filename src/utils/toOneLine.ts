@@ -7,7 +7,7 @@
  * 
  */
 function toOneLine (original: string): string {
-	return original.replace(/\n\s*/g, '');
+	return original.replace(/\n/g, ' ').replace(/\t/g, ' ');
 }
 
 export default toOneLine;

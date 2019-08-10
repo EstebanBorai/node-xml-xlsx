@@ -1,11 +1,13 @@
-import { toOneLine } from '../utils';
+import { toOneLine, getColumnIndex, getCellValueType } from '../utils';
 
-export enum ValueType {
-	string = 's',
-	number = 'n'
-}
-
-export const header = (dimensions: number) => toOneLine(`
+/**
+ * 
+ * @param dimensions - Columns range
+ * 
+ * Returns the header of the `sheet` XML file.
+ * 
+ */
+export const header = (dimensions: string) => toOneLine(`
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet
 	xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -21,12 +23,24 @@ export const header = (dimensions: number) => toOneLine(`
 <sheetFormatPr defaultRowHeight="15" x14ac:dyDescent="0.25"/>
 <sheetData>`);
 
-export const row = (row: number, body: string) => toOneLine(`
-<row r="${row}">
-	${body}
-</row>
-`);
+/**
+ * 
+ * @param rowIndex - Current row index
+ * @param values - List of values (cells) in this row
+ * 
+ * Returns the XML-XLSX row template
+ * 
+ */
+export const row = (rowIndex: number, values: Array<string | number>): string => {
+	let _row = `<row r="${rowIndex}" ht="13" hidden="false" customHeight="false" outlineLevel="0" collapsed="false">`;
+	_row = _row.concat(values.map((cellValue, index) => (
+		`<c r="${getColumnIndex(index)}${rowIndex}" t="${getCellValueType(cellValue)}"><v>${cellValue}</v></c>`
+	)).join('')).concat('</row>');
 
-export const cell = (row, value, valueType: ValueType) => `<c r="${row}" t="${valueType}"><v>${value}</v></c>`;
+	return _row;
+}
 
+/**
+ * Returns the footer of the XML `sheet` file.
+ */
 export const footer = `</sheetData></worksheet>`;
