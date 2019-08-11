@@ -4,7 +4,7 @@ import {
 	row
 } from '../templates/sheet';
 
-type XLSXValue = string | number;
+export type XLSXValue = string | number;
 
 export interface IRowValues {
 	[key: string]: XLSXValue

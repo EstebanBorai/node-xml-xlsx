@@ -1,8 +1,9 @@
 import Archiver, { Archiver as IArchiver } from 'archiver';
 import { PassThrough } from 'stream';
 import { createWriteStream, WriteStream } from 'fs';
-import Sheet, { IRowValues } from './Sheet';
+import Sheet, { IRowValues, XLSXValue } from './Sheet';
 import * as template from '../templates';
+import SharedStrings from './SharedStrings';
 
 export interface IXlsx {}
 
@@ -53,11 +54,13 @@ class Xlsx implements IXlsx {
 	private xlsxFile: IArchiver;
 	private stdout: PassThrough;
 	private sheet: Sheet;
+	private sharedStrings: SharedStrings;
 
 	constructor(options?: IXlsxOptions) {
 		this.xlsxFile = Archiver('zip');
 		this.stdout = new PassThrough(); /* PassThrough should be created only when a path to `fs` is not available */
 		this.sheet = new Sheet();
+		this.sharedStrings = new SharedStrings();
 		
 		// Append the first sheet of the XLSX file
 		// to the ZIP.
@@ -67,12 +70,41 @@ class Xlsx implements IXlsx {
 	}
 
 	public addRow(rowData: IRowValues): void {
-		const row = this.sheet.addRowFromObject(rowData);
+		const row = this.sheet.addRowFromObject(this.normalize(rowData) as IRowValues);
 		this.stdout.write(row);
 	}
 
-	public build(): void {
+	private normalize(original: IRowValues | Array<XLSXValue>): IRowValues | Array<XLSXValue> {
+		if (Array.isArray(original)) {
+			return original.map((value) => {
+				if (typeof value === 'string') {
+					return this.sharedStrings.fromString(value);
+				}
 
+				return value;
+			});
+		}
+
+		let normalizedObject: any = {};
+		const originalKeys = Object.keys(original);
+
+		for (let i = 0; i <= originalKeys.length; i++) {
+			const key = originalKeys[i];
+
+			if (typeof original[key] === 'string') {
+				normalizedObject[key] = this.sharedStrings.fromString((original as any).original[key]);
+			} else {
+				normalizedObject[key] = original[key];
+			}
+		}
+
+		return normalizedObject;
+	}
+
+	public async build(): Promise<void> {
+		this.xlsxFile.write(this.sheet.build());
+		await this.buildXlsx();
+		this.xlsxFile.finalize();
 	}
 
 	private buildXlsx(): Promise<void> {
@@ -86,10 +118,11 @@ class Xlsx implements IXlsx {
 			name: 'xl/styles.xml'
 		}).append(template.workbookRels, {
 			name: 'xl/_rels/workbook.xml.rels'
+		}).append(this.sharedStrings.build(), {
+			name: 'xl/sharedStrings.xml'
 		}).finalize();
 
 		// Missing xl/worksheets/_rels/sheet1.xml.rels
-		// Missing xl/sharedStrings.xml
 	}
 }
 
