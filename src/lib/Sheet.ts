@@ -1,5 +1,4 @@
 import {
-	footer as xmlFooter,
 	header as createXMLHeader,
 	row
 } from '../templates/sheet';
@@ -13,7 +12,6 @@ export interface IRowValues {
 interface ISheet {
 	rowCount: number;
 	addRowFromObject: (values: IRowValues) => string;
-	build(): string;
 }
 
 class Sheet implements ISheet {
@@ -75,13 +73,6 @@ class Sheet implements ISheet {
 
 		// Otherwise returns the recently created row
 		return currentRow;
-	}
-
-	/**
-	 * Returns the XML for this `sheet` file.
-	 */
-	public build(): string {
-		return  this.sheetData + xmlFooter;
 	}
 }
 
