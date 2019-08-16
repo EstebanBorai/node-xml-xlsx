@@ -1,1 +1,1 @@
-export { default } from './lib/xlsx';
+export { default } from './lib/Xlsx';

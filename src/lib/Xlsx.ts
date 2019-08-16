@@ -6,6 +6,10 @@ import SharedStrings from './SharedStrings';
 
 export interface IXlsx {}
 
+interface IRowDataNormalizeOptions {
+	withHeaders: boolean;
+}
+
 class Xlsx implements IXlsx {
 	private xlsxFile: IArchiver;
 	private sheetStream: PassThrough;
@@ -14,8 +18,8 @@ class Xlsx implements IXlsx {
 
 	constructor() {
 		this.xlsxFile = Archiver('zip');
-		this.sheet = new Sheet();
 		this.sharedStrings = new SharedStrings();
+		this.sheet = new Sheet();
 		this.sheetStream = new PassThrough({ objectMode: true });
 
 		// Append the first sheet of the XLSX file
@@ -26,8 +30,14 @@ class Xlsx implements IXlsx {
 	}
 
 	public addRow(rowData: IRowValues): void {
-		const row = this.sheet.addRowFromObject(this.normalize(rowData));
-		this.sheetStream.write(row);
+		if (this.sheet.rowCount === 0) {
+			// Register shared strings for the file headers
+			this.sheetStream.write(this.sheet.addRowFromObject(this.normalize(rowData, {
+				withHeaders: true
+			})));
+		}
+
+		this.sheetStream.write(this.sheet.addRowFromObject(this.normalize(rowData)));
 	}
 
 	public getStream(): IArchiver {
@@ -54,9 +64,17 @@ class Xlsx implements IXlsx {
 		// Missing xl/worksheets/_rels/sheet1.xml.rels
 	}
 
-	private normalize(original: IRowValues): IRowValues {
+	private normalize(original: IRowValues, options?: IRowDataNormalizeOptions): IRowValues {
 		let normalizedObject: any = {};
 		const originalKeys = Object.keys(original);
+
+		if (options && options.withHeaders) {
+			const columnHeaders = Object.keys(original);
+
+			for (let i = 0; i < columnHeaders.length; i++) {
+				this.sharedStrings.fromString(columnHeaders[i]);
+			}
+		}
 
 		for (let i = 0; i < originalKeys.length; i++) {
 			const key = originalKeys[i];

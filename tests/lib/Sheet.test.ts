@@ -42,3 +42,19 @@ describe('lib :: Sheet :: addRowFromObject', () => {
 		expect(secondRow).toBe('<row r=\"3\" ht=\"13\" hidden=\"false\" customHeight=\"false\" outlineLevel=\"0\" collapsed=\"false\"><c r=\"A3\" t=\"s\"><v>zoo</v></c></row>');
 	});	
 });
+
+describe('lib :: Sheet :: addFromArray', () => {
+	let sheet: Sheet;
+	
+	beforeEach(() => {
+		sheet = new Sheet();
+	});
+
+	it('returns the xml header with the first row at the first append', () => {
+		const created = sheet.addFromArray(['foo']);
+
+		const want = `<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <worksheet  xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"   xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" > <dimension ref=\"A1\"/> <sheetViews>  <sheetView workbookViewId=\"0\"/> </sheetViews> <sheetFormatPr defaultRowHeight=\"12.8\"></sheetFormatPr> <cols>  <col collapsed=\"false\" hidden=\"false\" max=\"1025\" min=\"1\" style=\"0\" width=\"12\" /> </cols> <sheetData><row r=\"1\" ht=\"13\" hidden=\"false\" customHeight=\"false\" outlineLevel=\"0\" collapsed=\"false\"><c r=\"A1\" t=\"s\"><v>foo</v></c></row>`;
+	
+		expect(created).toBe(want);
+	});
+});

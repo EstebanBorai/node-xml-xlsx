@@ -2,6 +2,7 @@ import {
 	header as createXMLHeader,
 	row
 } from '../templates/sheet';
+import SharedStrings from './SharedStrings';
 
 export type XLSXValue = string | number;
 
@@ -12,6 +13,7 @@ export interface IRowValues {
 interface ISheet {
 	rowCount: number;
 	addRowFromObject: (values: IRowValues) => string;
+	addFromArray: (values: XLSXValue[]) => string;
 }
 
 class Sheet implements ISheet {
@@ -71,6 +73,34 @@ class Sheet implements ISheet {
 			return this.sheetData;
 		}
 
+		// Otherwise returns the recently created row
+		return currentRow;
+	}
+
+	/**
+	 * 
+	 * @param values - Values to append to the current sheet
+	 * 
+	 * Receives an array of values and appends it to the current sheet.
+	 * 
+	 * Note: Values should be aligned with the column order, otherwise
+	 * columns will mismatch values in the resulting sheet.
+	 * 
+	 * In order to keep values aligned with columns use `addRowsFromObject`
+	 * instead.
+	 */
+	public addFromArray(values: XLSXValue[]): string {
+		if (this.headers.length === 0 && this.rowCount === 0) {
+			this.rowCount++;
+			this.sheetData += row(this.rowCount, values);
+
+			// The first time a row is added, return the complete header and data of the sheet
+			return this.sheetData;
+		}
+
+		this.rowCount++;
+		const currentRow = row(this.rowCount, values);
+		
 		// Otherwise returns the recently created row
 		return currentRow;
 	}
