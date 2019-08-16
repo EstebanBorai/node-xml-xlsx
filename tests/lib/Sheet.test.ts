@@ -58,3 +58,37 @@ describe('lib :: Sheet :: addFromArray', () => {
 		expect(created).toBe(want);
 	});
 });
+
+
+describe('lib :: Sheet :: getValueTypes', () => {
+	const expectedValues = {
+		firstName: 'string',
+		lastName: 'string',
+		age: 'number',
+		year: 'number'
+	}
+
+	let sheet: Sheet;
+	
+	beforeEach(() => {
+		sheet = new Sheet();
+		sheet['headers'] = ['firstName', 'lastName', 'age', 'year'];
+	});
+
+	it('gather value types from an array of values', () => {
+		const columnValueTypes = sheet['getValueTypes'](['John', 'Appleseed', 45, 2019]);
+
+		expect(columnValueTypes).toEqual(expectedValues);
+	});
+
+	it('gather value types from an object of values', () => {
+		const columnValueTypes = sheet['getValueTypes']({
+			firstName: 'Contoso',
+			lastName: 'University',
+			age: 20,
+			year: 1999
+		});
+
+		expect(columnValueTypes).toEqual(expectedValues);
+	});
+});

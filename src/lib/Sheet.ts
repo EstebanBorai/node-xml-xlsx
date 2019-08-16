@@ -2,7 +2,6 @@ import {
 	header as createXMLHeader,
 	row
 } from '../templates/sheet';
-import SharedStrings from './SharedStrings';
 
 export type XLSXValue = string | number;
 
@@ -16,16 +15,22 @@ interface ISheet {
 	addFromArray: (values: XLSXValue[]) => string;
 }
 
+interface IColumnValueTypes {
+	[s: string]: XLSXValue;
+}
+
 class Sheet implements ISheet {
 	public rowCount: number;
 	private sheetData: string;
 	private headers: Array<string>;
+	private columnValueTypes: IColumnValueTypes;
 	/* private lastColumnIndex: number; */
 
 	constructor() {
 		this.sheetData = createXMLHeader('A1');
 		this.rowCount = 0;
 		this.headers = [];
+		this.columnValueTypes = {};
 	}
 
 	/**
@@ -90,6 +95,10 @@ class Sheet implements ISheet {
 	 * instead.
 	 */
 	public addFromArray(values: XLSXValue[]): string {
+		if (this.columnValueTypes.length === 0) {
+			this.columnValueTypes = this.getValueTypes(values);
+		}
+
 		if (this.headers.length === 0 && this.rowCount === 0) {
 			this.rowCount++;
 			this.sheetData += row(this.rowCount, values);
@@ -103,6 +112,46 @@ class Sheet implements ISheet {
 		
 		// Otherwise returns the recently created row
 		return currentRow;
+	}
+
+	/**
+	 * 
+	 * @param values - Iterable of row values
+	 * 
+	 * Checks the `typeof` every value in an row and
+	 * returns it as an array of strings in the same
+	 * order as the given `values` object.
+	 * 
+	 * Note: Column headers are required in order to gather
+	 * value types.
+	 * 
+	 */
+	private getValueTypes(values: XLSXValue[] | IRowValues): IColumnValueTypes {
+		if (this.headers.length === 0) {
+			throw new Error('Unable to set column values. Missing column headers.');
+		}
+		
+		let columnValueTypes: IColumnValueTypes = {};
+
+		if (Array.isArray(values)) {
+			for (const headerIndex in this.headers) {
+				const currentHeader = this.headers[headerIndex];
+
+				columnValueTypes[currentHeader] = typeof values[headerIndex];
+			}
+
+			return columnValueTypes;
+		}
+
+		if (typeof values === 'object') {
+			for (const key in values) {
+				columnValueTypes[key] = typeof values[key];
+			}
+
+			return columnValueTypes;
+		}
+
+		throw new Error('Unexpected values object. Unable to gather values.');
 	}
 }
 
