@@ -4,6 +4,7 @@ import {
 	IRowTemplateValues
 } from '../templates/sheet';
 import SharedStrings from './SharedStrings';
+import { XLSXValueTypes } from '../utils';
 
 export type XLSXValue = string | number;
 
@@ -14,8 +15,7 @@ export interface IRowValues {
 interface ISheet {
 	rowCount: number;
 	sheetData: string;
-	// addRowFromObject: (values: IRowValues) => string;
-	addFromArray: (values: XLSXValue[]) => string;
+	addRow: (values: XLSXValue[]) => string;
 }
 
 class Sheet implements ISheet {
@@ -29,82 +29,16 @@ class Sheet implements ISheet {
 		this.rowCount = 0;
 	}
 
-	/**
-	 *
-	 * @param values - Values to append to the sheet
-	 * 
-	 * Receives an object where the `key` is equivalent to a Sheet
-	 * column and the `value` to the current row value at the given
-	 * `key`.
-	 * 
-	 * Eg:
-	 * ```
-	 * const row = {
-	 *   name: 'Esteban'
-	 * }
-	 * 
-	 * sheet.addRowFromObject(row);
-	 * ```
-	 * 
-	 * Will add the following to the Sheet:
-	 * 
-	 * | name    |
-	 * | ------- |
-	 * | Esteban |
-	 * 
-	 */
-	// public addRowFromObject(values: IRowValues): string {
-	// 	let isFirstAdd = false;
-
-	// 	if (this.headers.length === 0 && this.rowCount === 0) {
-	// 		// Adds the first row to the XLSX file given an object
-
-	// 		isFirstAdd = true;
-	// 		this.rowCount++;
-	// 		this.headers = Object.keys(values);
-	// 		this.sheetData += row(this.rowCount, Object.keys(values) as unknown as IRowTemplateValues[]);
-	// 		this.columnValueTypes = this.getValueTypes(values);
-	// 	}
-
-	// 	this.rowCount++;
-	// 	let currentRow = row(this.rowCount, this.headers.map((header) => values[header]));
-	// 	this.sheetData += currentRow;
-
-	// 	if (isFirstAdd) {
-	// 		// The first time a row is added, return the complete header and data of the sheet
-	// 		return this.sheetData;
-	// 	}
-
-	// 	// Otherwise returns the recently created row
-	// 	return currentRow;
-	// }
-
-	/**
-	 * 
-	 * @param values - Values to append to the current sheet
-	 * 
-	 * Receives an array of values and appends it to the current sheet.
-	 * 
-	 * Note: Values should be aligned with the column order, otherwise
-	 * columns will mismatch values in the resulting sheet.
-	 * 
-	 * In order to keep values aligned with columns use `addRowsFromObject`
-	 * instead.
-	 */
-	public addFromArray(values: XLSXValue[]): string {
-		return this.addRow(values);
-	}
-
-	private addRow(values: XLSXValue[]): string {
+	public addRow(values: XLSXValue[]): string {
 		let rowValues = values.map((value: XLSXValue) => {
 			let valueType = typeof value;
 			let finalValue;
 
-			if (valueType === 'string') {
+			if (valueType === XLSXValueTypes.string) {
 				finalValue = this.sharedStrings.fromString(value as string);
 			}
 
-			if (valueType === 'number') {
+			if (valueType === XLSXValueTypes.number) {
 				finalValue = value;
 			}
 
@@ -115,9 +49,9 @@ class Sheet implements ISheet {
 		});
 
 		this.rowCount++;
-		const rowString =  row(this.rowCount, rowValues as IRowTemplateValues[]);
+		const rowString = row(this.rowCount, rowValues as IRowTemplateValues[]);
 		this.sheetData += rowString;
-		
+
 		return rowString;
 	}
 }
