@@ -1,4 +1,10 @@
-import { toOneLine, getColumnIndex, getCellValueType } from '../utils';
+import { toOneLine, getColumnIndex, getCellValueType, XLSXValueTypes } from '../utils';
+import { XLSXValue } from '../lib/Sheet';
+
+export interface IRowTemplateValues {
+	value: XLSXValue;
+	type: XLSXValueTypes;
+}
 
 /**
  * 
@@ -31,10 +37,10 @@ export const header = (dimensions: string) => toOneLine(`
  * Returns the XML-XLSX row template
  * 
  */
-export const row = (rowIndex: number, values: Array<string | number>): string => {
+export const row = (rowIndex: number, values: IRowTemplateValues[]): string => {
 	let _row = `<row r="${rowIndex}" ht="13" hidden="false" customHeight="false" outlineLevel="0" collapsed="false">`;
-	_row = _row.concat(values.map((cellValue, index) => (
-		`<c r="${getColumnIndex(index)}${rowIndex}" t="${getCellValueType(cellValue)}"><v>${cellValue}</v></c>`
+	_row = _row.concat(values.map((rowObj: IRowTemplateValues, index) => (
+		`<c r="${getColumnIndex(index)}${rowIndex}" t="${getCellValueType(rowObj.type)}"><v>${rowObj.value}</v></c>`
 	)).join('')).concat('</row>');
 
 	return _row;

@@ -16,10 +16,10 @@ class Xlsx implements IXlsx {
 	private sheet: Sheet;
 	private sharedStrings: SharedStrings;
 
-	constructor() {
+	constructor(sharedStrings: SharedStrings) {
 		this.xlsxFile = Archiver('zip');
 		this.sharedStrings = new SharedStrings();
-		this.sheet = new Sheet();
+		this.sheet = new Sheet(sharedStrings);
 		this.sheetStream = new PassThrough({ objectMode: true });
 
 		// Append the first sheet of the XLSX file

@@ -1,7 +1,9 @@
 import {
 	header as createXMLHeader,
-	row
+	row,
+	IRowTemplateValues
 } from '../templates/sheet';
+import SharedStrings from './SharedStrings';
 
 export type XLSXValue = string | number;
 
@@ -11,26 +13,20 @@ export interface IRowValues {
 
 interface ISheet {
 	rowCount: number;
-	addRowFromObject: (values: IRowValues) => string;
+	sheetData: string;
+	// addRowFromObject: (values: IRowValues) => string;
 	addFromArray: (values: XLSXValue[]) => string;
-}
-
-interface IColumnValueTypes {
-	[s: string]: XLSXValue;
 }
 
 class Sheet implements ISheet {
 	public rowCount: number;
-	private sheetData: string;
-	private headers: Array<string>;
-	private columnValueTypes: IColumnValueTypes;
-	/* private lastColumnIndex: number; */
+	public sheetData: string;
+	private sharedStrings: SharedStrings;
 
-	constructor() {
+	constructor(sharedStrings: SharedStrings) {
 		this.sheetData = createXMLHeader('A1');
+		this.sharedStrings = sharedStrings;
 		this.rowCount = 0;
-		this.headers = [];
-		this.columnValueTypes = {};
 	}
 
 	/**
@@ -57,30 +53,31 @@ class Sheet implements ISheet {
 	 * | Esteban |
 	 * 
 	 */
-	public addRowFromObject(values: IRowValues): string {
-		let isFirstAdd = false;
+	// public addRowFromObject(values: IRowValues): string {
+	// 	let isFirstAdd = false;
 
-		if (this.headers.length === 0 && this.rowCount === 0) {
-			// Adds the first row to the XLSX file given an object
+	// 	if (this.headers.length === 0 && this.rowCount === 0) {
+	// 		// Adds the first row to the XLSX file given an object
 
-			isFirstAdd = true;
-			this.rowCount++;
-			this.headers = Object.keys(values);
-			this.sheetData += row(this.rowCount, Object.keys(values));
-		}
+	// 		isFirstAdd = true;
+	// 		this.rowCount++;
+	// 		this.headers = Object.keys(values);
+	// 		this.sheetData += row(this.rowCount, Object.keys(values) as unknown as IRowTemplateValues[]);
+	// 		this.columnValueTypes = this.getValueTypes(values);
+	// 	}
 
-		this.rowCount++;
-		let currentRow = row(this.rowCount, this.headers.map((header) => values[header]));
-		this.sheetData += currentRow;
+	// 	this.rowCount++;
+	// 	let currentRow = row(this.rowCount, this.headers.map((header) => values[header]));
+	// 	this.sheetData += currentRow;
 
-		if (isFirstAdd) {
-			// The first time a row is added, return the complete header and data of the sheet
-			return this.sheetData;
-		}
+	// 	if (isFirstAdd) {
+	// 		// The first time a row is added, return the complete header and data of the sheet
+	// 		return this.sheetData;
+	// 	}
 
-		// Otherwise returns the recently created row
-		return currentRow;
-	}
+	// 	// Otherwise returns the recently created row
+	// 	return currentRow;
+	// }
 
 	/**
 	 * 
@@ -95,63 +92,33 @@ class Sheet implements ISheet {
 	 * instead.
 	 */
 	public addFromArray(values: XLSXValue[]): string {
-		if (this.columnValueTypes.length === 0) {
-			this.columnValueTypes = this.getValueTypes(values);
-		}
-
-		if (this.headers.length === 0 && this.rowCount === 0) {
-			this.rowCount++;
-			this.sheetData += row(this.rowCount, values);
-
-			// The first time a row is added, return the complete header and data of the sheet
-			return this.sheetData;
-		}
-
-		this.rowCount++;
-		const currentRow = row(this.rowCount, values);
-		
-		// Otherwise returns the recently created row
-		return currentRow;
+		return this.addRow(values);
 	}
 
-	/**
-	 * 
-	 * @param values - Iterable of row values
-	 * 
-	 * Checks the `typeof` every value in an row and
-	 * returns it as an array of strings in the same
-	 * order as the given `values` object.
-	 * 
-	 * Note: Column headers are required in order to gather
-	 * value types.
-	 * 
-	 */
-	private getValueTypes(values: XLSXValue[] | IRowValues): IColumnValueTypes {
-		if (this.headers.length === 0) {
-			throw new Error('Unable to set column values. Missing column headers.');
-		}
+	private addRow(values: XLSXValue[]): string {
+		let rowValues = values.map((value: XLSXValue) => {
+			let valueType = typeof value;
+			let finalValue;
+
+			if (valueType === 'string') {
+				finalValue = this.sharedStrings.fromString(value as string);
+			}
+
+			if (valueType === 'number') {
+				finalValue = value;
+			}
+
+			return {
+				type: valueType,
+				value: finalValue
+			}
+		});
+
+		this.rowCount++;
+		const rowString =  row(this.rowCount, rowValues as IRowTemplateValues[]);
+		this.sheetData += rowString;
 		
-		let columnValueTypes: IColumnValueTypes = {};
-
-		if (Array.isArray(values)) {
-			for (const headerIndex in this.headers) {
-				const currentHeader = this.headers[headerIndex];
-
-				columnValueTypes[currentHeader] = typeof values[headerIndex];
-			}
-
-			return columnValueTypes;
-		}
-
-		if (typeof values === 'object') {
-			for (const key in values) {
-				columnValueTypes[key] = typeof values[key];
-			}
-
-			return columnValueTypes;
-		}
-
-		throw new Error('Unexpected values object. Unable to gather values.');
+		return rowString;
 	}
 }
 
