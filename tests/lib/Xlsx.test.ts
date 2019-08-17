@@ -48,23 +48,18 @@ describe('lib :: Xlsx :: getStream', () => {
 	});
 
 	it('triggers "data" event when adding a row', (done) => {
-		expect.assertions(1);
-
 		const rowData = ['foo', 'bar'];
 		const xlsxStream = xlsx.getStream();
-		const onDataMock = jest.fn((chunk) => {
-			return new Promise((resolve) => {
-				resolve(chunk.toString());
-			});
+		const onDataMock = jest.fn(() => {
+			console.log('DATA');
 		});
 
-		xlsxStream.on('data', (chunk) => {
-			onDataMock(chunk).then((data) => {
-				expect(data).toBe(rowData.toString());
-				done();
-			});
+		xlsxStream.on('data', () => {
+			onDataMock();
 		});
 
 		xlsx.addRow(rowData);
+
+		expect(onDataMock).toHaveBeenCalled();
 	});
 });
