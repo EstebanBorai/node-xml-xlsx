@@ -1,6 +1,6 @@
 import Archiver, { Archiver as IArchiver } from 'archiver';
 import { PassThrough } from 'stream';
-import Sheet, { IRowValues } from './Sheet';
+import Sheet, { XLSXValue } from './Sheet';
 import * as template from '../templates';
 import SharedStrings from './SharedStrings';
 
@@ -14,20 +14,13 @@ class Xlsx implements IXlsx {
 
 	constructor() {
 		this.xlsxFile = Archiver('zip');
-		this.sheet = new Sheet();
 		this.sharedStrings = new SharedStrings();
+		this.sheet = new Sheet(this.sharedStrings);
 		this.sheetStream = new PassThrough({ objectMode: true });
 
-		// Append the first sheet of the XLSX file
-		// to the ZIP.
 		this.xlsxFile.append(this.sheetStream, {
 			name: 'xl/worksheets/sheet1.xml'
 		});
-	}
-
-	public addRow(rowData: IRowValues): void {
-		const row = this.sheet.addRowFromObject(this.normalize(rowData));
-		this.sheetStream.write(row);
 	}
 
 	public getStream(): IArchiver {
@@ -54,21 +47,8 @@ class Xlsx implements IXlsx {
 		// Missing xl/worksheets/_rels/sheet1.xml.rels
 	}
 
-	private normalize(original: IRowValues): IRowValues {
-		let normalizedObject: any = {};
-		const originalKeys = Object.keys(original);
-
-		for (let i = 0; i < originalKeys.length; i++) {
-			const key = originalKeys[i];
-
-			if (typeof original[key] === 'string') {
-				normalizedObject[key] = this.sharedStrings.fromString(original[key] as string);
-			} else {
-				normalizedObject[key] = original[key];
-			}
-		}
-
-		return normalizedObject;
+	public addRow(values: XLSXValue[]): void {
+		this.sheetStream.write(this.sheet.addRow(values));
 	}
 }
 

@@ -22,10 +22,10 @@ stream.on('finish', () => {
 	console.log(`finished @ ${new Date().toISOString()}`);
 });
 
-file.addRow({
-	foo: 'bar',
-	bar: 1
-});
+file.addRow(['foo', 1, 'bar', 30.0]);
+file.addRow(['foo1', 2, 'bar1', 30.0]);
+file.addRow(['foo2', 3, 'bar2', 30.0]);
+file.addRow(['foo', 4, 'bar', 30.0]);
 
 file.build().then(() => {
 	console.log('BUILDED');

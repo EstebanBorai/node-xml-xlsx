@@ -1,3 +1,8 @@
+export enum XLSXValueTypes {
+	string = 'string',
+	number = 'number'
+}
+
 /**
  * 
  * @param value - Value to evaluate
@@ -6,14 +11,14 @@
  * If a value is invalid for a XLSX Row throws an exception.
  * 
  */
-function getCellValueType(value: any): string {
-	switch (typeof value) {
+function getCellValueType(valueType: XLSXValueTypes): string {
+	switch (valueType) {
 		case 'string':
 			return 's';
 		case 'number':
 			return 'n';
 		default:
-			throw new Error(`Invalid value of type ${typeof value}. Valid types are "string", "number".`);
+			throw new Error(`Unable to get value type for ${valueType}`);
 	}
 }
 

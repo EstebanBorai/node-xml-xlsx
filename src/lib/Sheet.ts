@@ -1,7 +1,10 @@
 import {
 	header as createXMLHeader,
-	row
+	row,
+	IRowTemplateValues
 } from '../templates/sheet';
+import SharedStrings from './SharedStrings';
+import { XLSXValueTypes } from '../utils';
 
 export type XLSXValue = string | number;
 
@@ -11,68 +14,82 @@ export interface IRowValues {
 
 interface ISheet {
 	rowCount: number;
-	addRowFromObject: (values: IRowValues) => string;
+	sheetData: string;
+	addRow: (values: XLSXValue[]) => string;
 }
 
 class Sheet implements ISheet {
 	public rowCount: number;
-	private sheetData: string;
-	private headers: Array<string>;
-	/* private lastColumnIndex: number; */
+	public sheetData: string;
+	private sharedStrings: SharedStrings;
 
-	constructor() {
+	constructor(sharedStrings: SharedStrings) {
 		this.sheetData = createXMLHeader('A1');
+		this.sharedStrings = sharedStrings;
 		this.rowCount = 0;
-		this.headers = [];
 	}
 
-	/**
-	 *
-	 * @param values - Values to append to the sheet
-	 * 
-	 * Receives an object where the `key` is equivalent to a Sheet
-	 * column and the `value` to the current row value at the given
-	 * `key`.
-	 * 
-	 * Eg:
-	 * ```
-	 * const row = {
-	 *   name: 'Esteban'
-	 * }
-	 * 
-	 * sheet.addRowFromObject(row);
-	 * ```
-	 * 
-	 * Will add the following to the Sheet:
-	 * 
-	 * | name    |
-	 * | ------- |
-	 * | Esteban |
-	 * 
-	 */
-	public addRowFromObject(values: IRowValues): string {
-		let isFirstAdd = false;
+	public addRow(values: XLSXValue[]): string {
+		let rowValues = values.map((value: XLSXValue) => {
+			try {
+				let valueType = this.getCellValueType(value);
+	
+				return {
+					type: valueType,
+					value: this.getFinalValue(value, valueType)
+				}
+			} catch (err) {
+				// If an error is thrown here, means that a value
+				// is invalid or not supported for the spreadsheet.
 
-		if (this.headers.length === 0 && this.rowCount === 0) {
-			// Adds the first row to the XLSX file given an object
+				// TODO: Create error objects to extract error details
+				// and expose the reason to the client otherwise will
+				// be tedious to find the wrong value and fix it.
 
-			isFirstAdd = true;
-			this.rowCount++;
-			this.headers = Object.keys(values);
-			this.sheetData += row(this.rowCount, Object.keys(values));
-		}
+				// IMPROVEMENT: Sanitizing values would be great
+				// in order to avoid endup here but at the same time
+				// is risky because it possible to cause data losses
+				throw new Error('Unable to fill sheet with given values.');
+			}
+		});
+
+		const isFirst = this.rowCount === 0;
 
 		this.rowCount++;
-		let currentRow = row(this.rowCount, this.headers.map((header) => values[header]));
-		this.sheetData += currentRow;
+		const rowString = row(this.rowCount, rowValues as IRowTemplateValues[]);
+		this.sheetData += rowString;
 
-		if (isFirstAdd) {
-			// The first time a row is added, return the complete header and data of the sheet
+		if (isFirst) {
 			return this.sheetData;
 		}
 
-		// Otherwise returns the recently created row
-		return currentRow;
+		return rowString;
+	}
+
+	private getCellValueType(value: any): XLSXValueTypes {
+		const type = typeof value;
+
+		if (type === 'string') {
+			return XLSXValueTypes.string;
+		}
+
+		if (type === 'number') {
+			return XLSXValueTypes.number;
+		}
+
+		throw new Error(`Invalid value of type ${type} for value ${value}`);
+	}
+
+	private getFinalValue(value: any, type: XLSXValueTypes): any {
+		if (type === XLSXValueTypes.string) {
+			return this.sharedStrings.fromString(value as string);
+		}
+
+		if (type === XLSXValueTypes.number) {
+			return value;
+		}
+
+		throw new Error(`Invalid value of type ${type} for value ${value}`);
 	}
 }
 
