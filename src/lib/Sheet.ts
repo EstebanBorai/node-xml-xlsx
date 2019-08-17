@@ -31,32 +31,65 @@ class Sheet implements ISheet {
 
 	public addRow(values: XLSXValue[]): string {
 		let rowValues = values.map((value: XLSXValue) => {
-			let valueType = typeof value;
-			let finalValue;
+			try {
+				let valueType = this.getCellValueType(value);
+	
+				return {
+					type: valueType,
+					value: this.getFinalValue(value, valueType)
+				}
+			} catch (err) {
+				// If an error is thrown here, means that a value
+				// is invalid or not supported for the spreadsheet.
 
-			if (valueType === XLSXValueTypes.string) {
-				finalValue = this.sharedStrings.fromString(value as string);
-			}
+				// TODO: Create error objects to extract error details
+				// and expose the reason to the client otherwise will
+				// be tedious to find the wrong value and fix it.
 
-			if (valueType === XLSXValueTypes.number) {
-				finalValue = value;
-			}
-
-			return {
-				type: valueType,
-				value: finalValue
+				// IMPROVEMENT: Sanitizing values would be great
+				// in order to avoid endup here but at the same time
+				// is risky because it possible to cause data losses
+				throw new Error('Unable to fill sheet with given values.');
 			}
 		});
+
+		const isFirst = this.rowCount === 0;
 
 		this.rowCount++;
 		const rowString = row(this.rowCount, rowValues as IRowTemplateValues[]);
 		this.sheetData += rowString;
 
-		if (this.rowCount === 0) {
+		if (isFirst) {
 			return this.sheetData;
 		}
 
 		return rowString;
+	}
+
+	private getCellValueType(value: any): XLSXValueTypes {
+		const type = typeof value;
+
+		if (type === 'string') {
+			return XLSXValueTypes.string;
+		}
+
+		if (type === 'number') {
+			return XLSXValueTypes.number;
+		}
+
+		throw new Error(`Invalid value of type ${type} for value ${value}`);
+	}
+
+	private getFinalValue(value: any, type: XLSXValueTypes): any {
+		if (type === XLSXValueTypes.string) {
+			return this.sharedStrings.fromString(value as string);
+		}
+
+		if (type === XLSXValueTypes.number) {
+			return value;
+		}
+
+		throw new Error(`Invalid value of type ${type} for value ${value}`);
 	}
 }
 
