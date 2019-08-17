@@ -52,6 +52,10 @@ class Sheet implements ISheet {
 		const rowString = row(this.rowCount, rowValues as IRowTemplateValues[]);
 		this.sheetData += rowString;
 
+		if (this.rowCount === 0) {
+			return this.sheetData;
+		}
+
 		return rowString;
 	}
 }
