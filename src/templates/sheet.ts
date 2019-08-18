@@ -1,9 +1,8 @@
 import { toOneLine, getColumnIndex, getCellValueType, XLSXValueTypes } from '../utils';
-import { XLSXValue } from '../lib/Sheet';
 
 export interface IRowTemplateValues {
-	value: XLSXValue;
 	type: XLSXValueTypes;
+	value: any;
 }
 
 /**

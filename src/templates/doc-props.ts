@@ -15,13 +15,13 @@ interface IDocCore {
  * 
  * https://wiki.fileformat.com/specification/spreadsheet/xlsx/
  */
-export const app = () => toOneLine(`
+export const app = toOneLine(`
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties 
 	xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
 	xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
 >
-	<TotalTime>84507</TotalTime>
+	<TotalTime></TotalTime>
 </Properties>
 `);
 
