@@ -7,23 +7,47 @@ npm i node-xml-xlsx
 ```
 ## Usage
 ```typescript
-import { createWriteStream } from 'fs';
-import Xlsx from 'node-xml-xlsx';
+# node-xml-xlsx
+📋 XLSX file generator for NodeJS
 
-// Create a new xlsx file
-const file = new Xlsx();
+## Installation
+```bash
+npm i node-xml-xlsx
+```
+## Usage
+```javascript
+const fs = require('fs');
+const ExcelXML = require('node-xml-xlsx');
 
-// Pipe a xlsx file's readableStream to a
-// fs writeableStream
-const xlsxStream = file.getStream();
-xlsxStream.pipe(createWriteableStream('path/to/output/file.xlsx'));
+async function createExcelWorkbook() {
+	const workbook = new ExcelXML(),
+		workbookStream = workbook.getStream();
 
-// Write to the worksheet
-const data = ['foo', 'bar', 12000];
-file.addRow(data);
+	workbookStream.pipe(fs.createWriteStream('./test.xlsx'));
 
-// Build the xlsx file
-file.build().then(() => {
-	console.log('Xlsx file has been created');
-});
+	workbook.addRow([
+		'id',
+		'first name',
+		'last name',
+		'age',
+		'country',
+		'date'
+	]);
+
+	workbook.addRow([
+		1,
+		'John',
+		'Appleseed',
+		42,
+		'EE.UU.',
+		new Date()
+	]);
+
+	await workbook.build();
+	console.log('XLSX has been created');
+}
+
+createExcelWorkbook();
+```
+
 ```
