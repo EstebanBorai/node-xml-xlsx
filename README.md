@@ -5,15 +5,7 @@
 ```bash
 npm i node-xml-xlsx
 ```
-## Usage
-```typescript
-# node-xml-xlsx
-📋 XLSX file generator for NodeJS
 
-## Installation
-```bash
-npm i node-xml-xlsx
-```
 ## Usage
 ```javascript
 const fs = require('fs');
