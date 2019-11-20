@@ -4,7 +4,10 @@ import Sheet, { XLSXValue } from './Sheet';
 import * as template from '../templates';
 import SharedStrings from './SharedStrings';
 
-export interface IXlsx {}
+export interface IXlsx {
+	getStream: () => IArchiver;
+	addRow: (values: XLSXValue[]) => void;
+}
 
 class Xlsx implements IXlsx {
 	private xlsxFile: IArchiver;
@@ -23,10 +26,23 @@ class Xlsx implements IXlsx {
 		});
 	}
 
+	/**
+	 * Returns an Archiver instance that can be used to pipe the file
+	 * contents to a writeable stream while writting the xlsx file.
+	 * 
+	 * @remarks
+	 * `node-xml-xlsx` uses Archiver internally to create a zip file.
+	 * 
+	 * @returns An instance of Archiver
+	 */
 	public getStream(): IArchiver {
 		return this.xlsxFile;
 	}
 
+	/**
+	 * Finalizes writting process and write fotters to the `zip` file.
+	 *
+	 */
 	public async build(): Promise<void> {
 		this.sheetStream.write(template.sheetFooter);
 		this.sheetStream.end();
@@ -47,6 +63,14 @@ class Xlsx implements IXlsx {
 		// Missing xl/worksheets/_rels/sheet1.xml.rels
 	}
 
+	/**
+	 * Appends a new row to the xlsx file based on the array values.
+	 * Each element of the array represents a column of the xlsx file.
+	 * 
+	 * @remarks See [[XLSXValue]] interface for more details
+	 * 
+	 * @param values - Array of XLSXValue
+	 */
 	public addRow(values: XLSXValue[]): void {
 		this.sheetStream.write(this.sheet.addRow(values));
 	}

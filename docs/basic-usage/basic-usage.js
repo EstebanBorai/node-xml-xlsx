@@ -1,9 +1,12 @@
-const ExcelXML = require('../../dist/index').default;
+const fs = require('fs');
+const Xlsx = require('../../dist/index');
 
-const workbook = new ExcelXML();
-workbook.init();
+const xlsx = new Xlsx();
+const xlsxFileStream = xlsx.getStream();
 
-workbook.addRow([
+xlsxFileStream.pipe(fs.createWriteStream('./new-workbook.xlsx'));
+
+xlsx.addRow([
 	'id',
 	'first name',
 	'last name',
@@ -12,13 +15,12 @@ workbook.addRow([
 	'date'
 ]);
 
-workbook.addRow([
+xlsx.addRow([
 	1,
 	'John',
 	'Appleseed',
 	42,
 	'EE.UU.',
-	new Date()
 ]);
 
-console.log(workbook.end());
+xlsx.build();
