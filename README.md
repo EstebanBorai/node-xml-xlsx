@@ -114,3 +114,11 @@ A `Sheet` implements the capabilities of an **xlsx** file's sheet.
 > Sheet's API is exported but its usage is internal, in the current version `node-xml-xlsx` is capable of creating single sheet workbooks only.
 
 ### Sheet - XLSXValue
+`Sheet`'s type `XLSXValue` enumerates available types to be written in
+a sheet.
+
+The current types are:
+- String
+- Number
+
+Support for more types could be added further based on Issues/Requests.
