@@ -1,6 +1,6 @@
 {
   "name": "node-xml-xlsx",
-  "version": "1.0.0",
+  "version": "0.2.2",
   "description": "XLSX file generator for NodeJS",
   "main": "dist/index.js",
   "scripts": {
