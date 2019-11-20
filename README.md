@@ -41,17 +41,17 @@ xlsx.build();
 
 ## API
 - Xlsx
-	- [Xlsx]()
-	- [getStream]()
-	- [addRow]()
-	- [build]()
+	- [Xlsx](https://github.com/estebanborai/node-xml-xlsx#xlsx)
+	- [getStream](https://github.com/estebanborai/node-xml-xlsx#xlsxgetstream-archiver)
+	- [addRow](https://github.com/estebanborai/node-xml-xlsx#xlsxaddrowvalues-xlsxvalue-void)
+	- [build](https://github.com/estebanborai/node-xml-xlsx#xlsxbuild-promise)
 
 - Sheet
-	- [Sheet]()
-	- [XLSXValue]()
+	- [Sheet](https://github.com/estebanborai/node-xml-xlsx#sheet)
+	- [XLSXValue](https://github.com/estebanborai/node-xml-xlsx#sheet---xlsxvalue)
 
 ### Xlsx
-Create an instance of `Xlsx` class in order to create a new XLSX workbook.
+Creates an instance of `Xlsx` object in order to write a new XLSX workbook.
 
 ```javascript
 const Xlsx = require('node-xml-xlsx');
@@ -59,7 +59,7 @@ const Xlsx = require('node-xml-xlsx');
 const xlsx = new Xlsx();
 ```
 
-### Xlsx.getStream(): IArchiver
+### Xlsx.getStream(): Archiver
 `node-xml-xlsx` uses [Archiver](https://github.com/archiverjs/node-archiver) internally to create a **zip** file.
 An **xlsx** file is basically a **zip** file with an specific structure based on **xml** files.
 
@@ -122,3 +122,10 @@ The current types are:
 - Number
 
 Support for more types could be added further based on Issues/Requests.
+
+## Contributions
+Any contribution is welcome, feel free to open either a pull request or issue (also both), and remember
+to write out your name, email and website in the *Authors* file.
+
+## License
+Licensed under the [MIT License](https://github.com/estebanborai/node-xml-xlsx/blob/master/LICENSE)
