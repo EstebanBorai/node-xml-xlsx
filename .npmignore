@@ -13,3 +13,4 @@ Thumbs.db
 tests
 jest.config.js
 tsconfig.json
+.editorconfig
