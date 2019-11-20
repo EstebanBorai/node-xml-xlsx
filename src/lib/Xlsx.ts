@@ -40,7 +40,7 @@ class Xlsx implements IXlsx {
 	}
 
 	/**
-	 * Finalizes writting process and write fotters to the `zip` file.
+	 * Finalizes writting process and write footters to the `zip` file.
 	 *
 	 */
 	public async build(): Promise<void> {

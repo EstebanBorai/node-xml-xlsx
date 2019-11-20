@@ -101,7 +101,7 @@ xlsx.addRow([
 ```
 
 ### Xlsx.build(): Promise<void>
-Finalizes writting process and write fotters to the **zip** file.
+Finalizes writting process and write footters to the **zip** file.
 
 ```javascript
 // Invoke build to finish workbook writting
