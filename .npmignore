@@ -10,3 +10,6 @@ rollup.config.js
 .DS_Store
 Thumbs.db
 .env
+tests
+jest.config.js
+tsconfig.json
