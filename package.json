@@ -12,6 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/estebanborai/node-xml-xlsx.git"
   },
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
+	},
   "keywords": [
     "xlsx",
     "nodejs",
